@@ -31,15 +31,15 @@ giornorun=substr(dtr,4,2)
 fmt = '%-.1f'
 *
 *
-'d 'tmp2m' - 273.15'
-retval=subwrd(result,4)
-retval=math_format(fmt,retval)
-write(outfile,annorun%'-'%meserun%'-'%giornorun%' '%orarun%' T:'%retval)
+*'d DLWRFsfc'
+*retval=subwrd(result,4)
+*retval=math_format(fmt,retval)
+*write(outfile,annorun%'-'%meserun%'-'%giornorun%' '%orarun%' Long:'%retval,append)
 *
 'd DSWRFsfc'
 retval=subwrd(result,4)
 retval=math_format(fmt,retval)
-write(outfile,annorun%'-'%meserun%'-'%giornorun%' '%orarun%' R:'%retval)
+write(outfile,annorun%'-'%meserun%'-'%giornorun%' '%orarun%' Short:'%retval,append)
 
 *
 say "Fine script."
