@@ -1,0 +1,18 @@
+#install virtualenv
+sudo pip install virtualenv
+OR: if you don't have pip installed
+sudo easy_install virtualenv (mac)
+sudo apt-get install python-virtualenv (linux)
+
+#create a new virtual environment
+virtualenv flask
+
+#install flask in the virtual environment
+flask/bin/pip install flask
+
+#create your file..
+touch namefile.py
+#change permissions:
+chmod 744 namefile.py 
+#run it
+./namefile.py
