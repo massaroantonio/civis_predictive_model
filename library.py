@@ -137,7 +137,10 @@ def get_signal(path_to_production_forecast,hydro_forecast,consumption_forecast,p
     for i in range(16):
         Delta3.append(sum(Delta[3*i:3*(i+1)]))
     for i in range(len(Delta3)):
-        outFile.write(str((i+1)*3)+','+str(Delta3[i]>0)+'\n')
+        # outFile.write(str((i+1)*3)+','+str(Delta3[i]>0)+'\n')
+        # modified by DM to account for the requirements of the Web APIs
+        outTariff='Low' if (Delta3[i]>0) else 'High'
+        outFile.write(str((i+1)*3)+','+outTariff+'\n')
     outFile.close()
     return
 def update(year,month,day,run_hour,place):
@@ -185,8 +188,8 @@ def update(year,month,day,run_hour,place):
 # new function that updates for the current date
 def updateToday(place):
     currentDate=datetime.today()
-    roundedHour = int(3*round(currentDate.hour/3))
-    update(currentDate.year,currentDate.month,currentDate.day,roundedHour,place)
+    roundedHour = int(6*round(currentDate.hour/6))
+    update(currentDate.year,currentDate.month,currentDate.day,str(roundedHour),place)
     return
 # new function that updates for both pilot sites
 def updateTodayBothPlaces():
