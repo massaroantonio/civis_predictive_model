@@ -182,5 +182,18 @@ def update(year,month,day,run_hour,place):
     forecast_production(rad_fc,pv_fc,intercept,slope)
     get_signal(pv_fc,hydro,consumption_forecast,signal_file,time_offset)
     return
+# new function that updates for the current date
+def updateToday(place):
+    currentDate=datetime.today()
+    roundedHour = int(3*round(currentDate.hour/3))
+    update(currentDate.year,currentDate.month,currentDate.day,roundedHour,place)
+    return
+# new function that updates for both pilot sites
+def updateTodayBothPlaces():
+    updateToday('Storo')
+    updateToday('San_Lorenzo')
+    return
 
-update(2015,12,10,'00','San_Lorenzo')
+
+
+# update(2015,12,10,'00','San_Lorenzo')
