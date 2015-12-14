@@ -188,9 +188,10 @@ def update(year,month,day,run_hour,place):
 # new function that updates for the current date
 def updateToday(place):
     currentDate=datetime.today()
-    roundedHour = int(6*round(currentDate.hour/6))
-    print(str(roundedHour))
-    update(currentDate.year,currentDate.month,currentDate.day,str(roundedHour),place)
+    #roundedHour = int(6*round(currentDate.hour/6))
+    run_hour='00'
+    #print(str(roundedHour))
+    update(currentDate.year,currentDate.month,currentDate.day,run_hour,place)
     return
 # new function that updates for both pilot sites
 def updateTodayBothPlaces():
@@ -200,4 +201,4 @@ def updateTodayBothPlaces():
 
 
 
-# update(2015,12,10,'00','San_Lorenzo')
+updateToday('San_Lorenzo')
