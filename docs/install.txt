@@ -1,3 +1,15 @@
+#install wgrib2
+Follow the instructions at:
+http://ftp.cpc.ncep.noaa.gov/wd51we/wgrib2/INSTALLING
+
+#install grads
+Follow the instructions at:
+http://www.iges.org/grads/downloads.html
+
+add grads and gribmap to the path (or create symbolic links with ln -s source /usr/bin/namefile, remember to use absolute path for $source)
+
+requires /tmp to be writable
+
 #install virtualenv
 sudo pip install virtualenv
 OR: if you don't have pip installed
@@ -16,3 +28,6 @@ touch namefile.py
 chmod 744 namefile.py 
 #run it
 ./namefile.py
+
+#make sure the virtualenv is running, in case
+cd to your virtualenv's directory and type . bin/activate

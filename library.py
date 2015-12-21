@@ -201,4 +201,4 @@ def updateTodayBothPlaces():
 
 
 
-updateToday('San_Lorenzo')
+# updateToday('San_Lorenzo')
