@@ -198,7 +198,25 @@ def updateTodayBothPlaces():
     updateToday('Storo')
     updateToday('San_Lorenzo')
     return
-
+#returns the nearest signal (nearest with respect to the current time)
+#note: it does not take care of timezones. it has to be launched from a computer that is sync with the italian timeshift
+#note: the data relative to the current date must be already available for the function to give outputm otherwise it outputs a warning
+def get_nearest_value(place):
+    now=datetime.now()
+    y=now.year
+    m=now.month
+    d=now.day
+    h=now.hour
+    mydir=str(d)+'_'+str(m)+'_'+str(y)+'_00_'+place    
+    myfile='signal_'+str(d)+'_'+str(m)+'_'+str(y)+'_00_'+place+'.txt'
+    output_dir=root+'outputs/'
+    assert mydir in os.listdir(output_dir) ,'the forecast for the current day and place has not been run yet'
+    assert myfile in os.listdir(output_dir+mydir), 'missing signal file'
+    f=open(output_dir+mydir+'/'+myfile)
+    time=np.array([int(l.split(',')[0]) for l in f])
+    f.seek(0)
+    signal=[l.split(',')[1] for l in f]
+    return signal[np.argmin(np.abs(time-h))][:-1]
 
 
 # updateToday('San_Lorenzo')
