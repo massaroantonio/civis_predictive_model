@@ -1,23 +1,29 @@
 #!flask/bin/python
 from flask import Flask, jsonify
 import datetime
-import os, csv
+import os, csv, sys
 
 app = Flask(__name__)
+# from app import app
 
 root=os.getcwd()+'/'
-# one run per day at 1 am, hence the file starts from midnight of the same day
+# # one run per day at 1 am, hence the file starts from midnight of the same day
 run_hour='00'
 
 
-# here goes the code for computing the current values to be returned
-# for the time being this is a stub
-currentTarif = "low"
+# # here goes the code for computing the current values to be returned
+# # for the time being this is a stub
+# currentTarif = "low"
 currentDate = datetime.datetime.now()
+# currentDate=datetime.datetime(2015,12,11)
+
 
 roundedHour = '00' 
-# roundedHour = int(3*round(currentDate.hour/3))
-currentDate = currentDate.replace(minute=0, second=0, microsecond=0, hour=int(roundedHour)
+# # roundedHour = int(3*round(currentDate.hour/3))
+currentDate = currentDate.replace(minute=0, second=0, microsecond=0, hour=int(roundedHour))
+
+
+
 # datesArray= []
 # for i in range(48):
 # 	datesArray.append({"date" : str(currentDate+datetime.timedelta(hours=3*i)), "tarif" : "high"})
@@ -81,4 +87,3 @@ def get_sanlorenzo():
 if __name__ == '__main__':
     app.run(debug=True)
 
-    
