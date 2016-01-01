@@ -31,3 +31,6 @@ chmod 744 namefile.py
 
 #make sure the virtualenv is running, in case
 cd to your virtualenv's directory and type . bin/activate
+
+#requires numpy
+pip install numpy
