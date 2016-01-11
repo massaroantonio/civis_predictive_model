@@ -64,12 +64,25 @@ def get_hydro_ceis(file_name,date):
 def get_hydro_cedis(file_name,date):
     k=0
     f=open(file_name,'r')
+    hydro=[]
     for l in f:
         if k:
             l=l.split(',')
-            hydro=[float(x) for x in l]
+            if datetime.strptime(l[1],'%d/%m/%Y') in [date, date+timedelta(1)]:
+                hydro+=[float(x) for x in l[2:-1]]
         k+=1
-    return np.array(hydro+hydro)
+    return np.array(hydro)
+
+
+#def get_hydro_cedis(file_name,date):
+    #k=0
+    #f=open(file_name,'r')
+    #for l in f:
+        #if k:
+            #l=l.split(',')
+            #hydro=[float(x) for x in l]
+        #k+=1
+    #return np.array(hydro+hydro)
 
 def create_ctl_file(path_to_perl_script,path_to_grib_file):
     command='perl '+path_to_perl_script+' '+path_to_grib_file+'>'+path_to_grib_file+'.ctl' 
