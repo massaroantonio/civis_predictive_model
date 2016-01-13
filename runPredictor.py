@@ -1,9 +1,9 @@
-# new function that runs every 24 hours at 1am
+# new function that runs every 24 hours at 3am
 import time
 import schedule
 import library
 
-schedule.every().day.at("1:00").do(library.updateTodayBothPlaces)
+schedule.every().day.at("3:00").do(library.updateTodayBothPlaces)
 
 while 1:
     schedule.run_pending()

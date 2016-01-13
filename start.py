@@ -8,7 +8,7 @@ app = Flask(__name__)
 # from app import app
 
 root=os.getcwd()+'/'
-# # one run per day at 1 am, hence the file starts from midnight of the same day
+# # one run per day at 3 am, hence the file starts from midnight of the same day
 run_hour='00'
 
 
