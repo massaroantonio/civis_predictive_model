@@ -40,6 +40,7 @@ use Math::Trig qw(deg2rad rad2deg);
 # ***** if wgrib2 is not on path, add it here
 #$wgrib2='wgrib2';
 $wgrib2='./grib2/wgrib2/wgrib2';
+#$wgrib2='/usr/local/wgrib2/wgrib2';
 # $wgrib2='/export/cpc-lw-webisuzak/wd51we/bin.lnx64/wgrib2';
 # $wgrib2='/export/cpc-lw-webisuzak/wd51we/grib2/wgrib2/wgrib2';
 

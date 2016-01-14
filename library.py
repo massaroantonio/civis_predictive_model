@@ -1,4 +1,4 @@
-importpython urllib2
+import urllib2
 import matplotlib.pyplot as plt
 import numpy as np
 import os
@@ -200,17 +200,13 @@ def get_signal(path_to_production_forecast,hydro_forecast,consumption_forecast,p
     Production=adjust_production(Production,time_offset)    
     Production=np.array(Production)
     Delta=Production+hydro_forecast-consumption_forecast
-    print Delta
     Delta3=[]
     for i in range(16):
         Delta3.append(sum(Delta[3*i:3*(i+1)]))
     Delta3_signal=np.array(Delta3)>0
     check=check_if_signal_is_trivial(Delta3_signal)
-    print check
     if sum(check):
         Delta3_signal=alternative_signal(Delta3,check)
-        print Delta3_signal
-        print Delta3
     for i in range(len(Delta3_signal)):
         outFile.write(str((i+1)*3)+','+str(Delta3_signal[i])+'\n')
     outFile.close()
