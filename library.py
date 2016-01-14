@@ -1,4 +1,4 @@
-import urllib2
+importpython urllib2
 import matplotlib.pyplot as plt
 import numpy as np
 import os
@@ -130,6 +130,60 @@ def download_and_create_ctl_idx_files(run_hour,year,month,day,forward,download_d
     create_ctl_file(path_to_perl_script,download_directory+filename)
     create_idx_file(download_directory+filename+'.ctl')
     return
+#def get_signal(path_to_production_forecast,hydro_forecast,consumption_forecast,path_to_signal_file,time_offset):
+#    inFile=open(path_to_production_forecast,'r')
+#    outFile=open(path_to_signal_file,'w')
+#    time=[]
+#    Time=[]
+#    production=[]
+#    Production=[]
+#    for l in inFile:
+#        l=l.split('Production:')
+#        Production.append(float(l[1]))
+#    inFile.close()
+    #print Production
+    #time-shift of Production data and rescaling of initial and final time-window
+#    Production=adjust_production(Production,time_offset)    
+#    Production=np.array(Production)
+#    Delta=Production+hydro_forecast-consumption_forecast
+#    Delta3=[]
+#    for i in range(16):
+#        Delta3.append(sum(Delta[3*i:3*(i+1)]))
+#    for i in range(len(Delta3)):
+        # outFile.write(str((i+1)*3)+','+str(Delta3[i]>0)+'\n')
+        # modified by DM to account for the requirements of the Web APIs
+#        outTariff='Low' if (Delta3[i]>0) else 'High'
+#        outFile.write(str((i+1)*3)+','+outTariff+'\n')
+#    outFile.close()
+#    return
+
+def check_if_signal_is_trivial(v):
+    output=[0,0]
+    if sum(v[:8])==0 or sum(v[:8])==8:
+        output[0]=1
+    if sum(v[8:])==0 or sum(v[8:])==8:
+        output[1]=1
+    return output
+
+def alternative_signal(Delta3,check):
+    delta=np.array(Delta3)
+    delta0=delta[:8]
+    delta1=delta[8:]
+    output0=delta0>0
+    output1=delta1>0
+    if check[0]:
+        indexesTrue=np.argsort(-delta0)[:3]
+        indexesFalse=np.argsort(-delta0)[3:]
+        output0[indexesTrue]=True
+        output0[indexesFalse]=False
+    if check[1]:
+        indexesTrue=np.argsort(-delta1)[:3]
+        indexesFalse=np.argsort(-delta1)[3:]
+        output1[indexesTrue]=True
+        output1[indexesFalse]=False
+    return np.concatenate((output0,output1))
+
+
 def get_signal(path_to_production_forecast,hydro_forecast,consumption_forecast,path_to_signal_file,time_offset):
     inFile=open(path_to_production_forecast,'r')
     outFile=open(path_to_signal_file,'w')
@@ -146,16 +200,25 @@ def get_signal(path_to_production_forecast,hydro_forecast,consumption_forecast,p
     Production=adjust_production(Production,time_offset)    
     Production=np.array(Production)
     Delta=Production+hydro_forecast-consumption_forecast
+    print Delta
     Delta3=[]
     for i in range(16):
         Delta3.append(sum(Delta[3*i:3*(i+1)]))
-    for i in range(len(Delta3)):
-        # outFile.write(str((i+1)*3)+','+str(Delta3[i]>0)+'\n')
-        # modified by DM to account for the requirements of the Web APIs
-        outTariff='Low' if (Delta3[i]>0) else 'High'
-        outFile.write(str((i+1)*3)+','+outTariff+'\n')
+    Delta3_signal=np.array(Delta3)>0
+    check=check_if_signal_is_trivial(Delta3_signal)
+    print check
+    if sum(check):
+        Delta3_signal=alternative_signal(Delta3,check)
+        print Delta3_signal
+        print Delta3
+    for i in range(len(Delta3_signal)):
+        outFile.write(str((i+1)*3)+','+str(Delta3_signal[i])+'\n')
     outFile.close()
     return
+
+
+
+
 def update(year,month,day,run_hour,place):
     assert len(str(year))==4, 'year format must be yyyy'
     assert month in [1,2,3,4,5,6,7,8,9,10,11,12], 'month must be an int between 1 and 12'
