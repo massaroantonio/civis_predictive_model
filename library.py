@@ -297,9 +297,23 @@ def job():
     now=datetime.now()
     if now.hour==0:
         check_all_good=0
+        f=open('logfile.txt','a')
+        f.write(str(now)+','+str(check_all_good)+',check_all_good set to 0\n')
+        f.close()
+
     if check_all_good==0 and now.hour in [h for h in range(3,12)]:
         check_all_good=updateTodayBothPlaces()
-    f=open('logfile.txt','a')
-    f.write(str(now)+','+str(check_all_good)+'\n')
-    f.close()
+        if check_all_good:
+            f=open('logfile.txt','a')
+            f.write(str(now)+','+str(check_all_good)+',updateTodayBothPlaces has ran succesfully\n')
+            f.close()
+        else:
+            f=open('logfile.txt','a')
+            f.write(str(now)+','+str(check_all_good)+',updateTodayBothPlaces has not ran succesfully\n')
+            f.close()
+    else:
+        f=open('logfile.txt','a')
+        f.write(str(now)+','+str(check_all_good)+',updateTodayBothPlaces has not run\n')
+        f.close()
+
     return
