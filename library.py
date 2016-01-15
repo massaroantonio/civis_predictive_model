@@ -211,8 +211,11 @@ def get_signal(path_to_production_forecast,hydro_forecast,consumption_forecast,p
     check=check_if_signal_is_trivial(Delta3_signal)
     if sum(check):
         Delta3_signal=alternative_signal(Delta3,check)
+
     for i in range(len(Delta3_signal)):
-        outFile.write(str((i+1)*3)+','+str(Delta3_signal[i])+'\n')
+        # modified by DM to account for the requirements of the Web APIs
+        outTariff='Low' if Delta3_signal[i] else 'High'
+        outFile.write(str((i+1)*3)+','+outTariff+'\n')
     outFile.close()
     return
 
@@ -286,7 +289,7 @@ def updateTodayBothPlaces():
 
 
 # everyday at midnioght utc check is set to 0 and as soon as updatebothplaces succedes, it is turned to 1 and job does not updatebothplaces any more
-# updatebothplaces runs between 3 am utc and 12 pm utc
+# updatebothplaces runs between 3 am utc and 12 am utc
 # siris is on UTC, therefore the check variable needs to be reset at  00 pm machine time
 check_all_good=0
 
