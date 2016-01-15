@@ -313,7 +313,7 @@ def job():
             f.close()
     else:
         f=open('logfile.txt','a')
-        f.write(str(now)+','+str(check_all_good)+',updateTodayBothPlaces has not run\n')
+        f.write(str(now)+','+str(check_all_good)+',updateTodayBothPlaces has been skipped\n')
         f.close()
 
     return
