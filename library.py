@@ -1,8 +1,8 @@
 import urllib2
-import matplotlib.pyplot as plt
 import numpy as np
 import os
 from datetime import datetime,timedelta
+from socket import error as SocketError
 
 #root='/home/amassaro/civis/CIVIS_repository/civis_predictive_model/civis_predictive_model/'
 #some functions need absolute paths, insert the absolute path of the current folder here
@@ -122,14 +122,18 @@ def download_and_create_ctl_idx_files(run_hour,year,month,day,forward,download_d
     assert forward in forwards,'forward must be one of the following: '+str(forwards)
     
     url='http://nomads.ncep.noaa.gov/cgi-bin/filter_gfs_0p25.pl?file=gfs.t'+run_hour+'z.pgrb2.0p25.f0'+forward+'&all_lev=on&all_var=on&subregion=&leftlon=8&rightlon=12&toplat=48&bottomlat=43&dir=%2Fgfs.'+year+month+day+run_hour
-    grib = urllib2.urlopen(url)
+    #grib = urllib2.urlopen(url)
+    try:
+        response=urllib2.urlopen(url).read()
+    except SocketError:
+        return 0
     filename=year+'_'+month+'_'+day+'_'+run_hour+'_'+forward
     output = open(download_directory+filename,'wb')
-    output.write(grib.read())
+    output.write(response)
     output.close()
     create_ctl_file(path_to_perl_script,download_directory+filename)
     create_idx_file(download_directory+filename+'.ctl')
-    return
+    return 1
 #def get_signal(path_to_production_forecast,hydro_forecast,consumption_forecast,path_to_signal_file,time_offset):
 #    inFile=open(path_to_production_forecast,'r')
 #    outFile=open(path_to_signal_file,'w')
@@ -236,6 +240,7 @@ def update(year,month,day,run_hour,place):
         consumption_forecast=get_avg_consumption(consumption_forecast_sLorenzo,weekday,month)
         hydro=get_hydro_ceis(hydro_sLorenzo,current_date)
     current_dir=str(day)+'_'+str(month)+'_'+str(year)+'_'+run_hour+'_'+place
+    os.system('rm -r '+'outputs/'+current_dir)
     os.system('mkdir '+'outputs/'+current_dir)
     os.system('mkdir '+'outputs/'+current_dir+'/gribs')
     
@@ -245,7 +250,9 @@ def update(year,month,day,run_hour,place):
     signal_file=root+'outputs/'+current_dir+'/signal_'+str(day)+'_'+str(month)+'_'+str(year)+'_'+str(run_hour)+'_'+place+'.txt'
     #the directories entered into download_and_create_ctl_idx_files must be ABSOLUTE
     for forward in forwards:
-        download_and_create_ctl_idx_files(run_hour,year,month,day,forward,download_directory,perl_script)
+         if download_and_create_ctl_idx_files(run_hour,year,month,day,forward,download_directory,perl_script)==0:
+            print 'socket error, aborting'
+            return 0
 
     files=os.listdir(download_directory)
     files=[f for f in files if '.ctl' in f]
@@ -256,23 +263,39 @@ def update(year,month,day,run_hour,place):
         print_radiation_to_file(grads_script,lat,lon,ctl_file,rad_fc)
     forecast_production(rad_fc,pv_fc,intercept,slope)
     get_signal(pv_fc,hydro,consumption_forecast,signal_file,time_offset)
-    return
+    return 1
 # new function that updates for the current date
 def updateToday(place):
     currentDate=datetime.today()
     #roundedHour = int(6*round(currentDate.hour/6))
     run_hour='00'
     #print(str(roundedHour))
-    update(currentDate.year,currentDate.month,currentDate.day,run_hour,place)
-    return
+    if update(currentDate.year,currentDate.month,currentDate.day,run_hour,place)==0:
+        return 0
+    return 1
 # new function that updates for both pilot sites
 def updateTodayBothPlaces():
-    updateToday('Storo')
-    updateToday('San_Lorenzo')
-    return
+    if updateToday('Storo')==0:
+        return 0
+    if updateToday('San_Lorenzo')==0:
+        return 0
+    return 1
 #returns the nearest signal (nearest with respect to the current time)
 #note: it does not take care of timezones. it has to be launched from a computer that is sync with the italian timeshift
 
 
 
-# updateToday('San_Lorenzo')
+# everyday at midnioght utc check is set to 0 and as soon as updatebothplaces succedes, it is turned to 1 and job does not updatebothplaces any more
+# updatebothplaces runs between 3 am utc and 12 pm utc
+# siris is on UTC, therefore the check variable needs to be reset at  00 pm machine time
+check_all_good=0
+
+def job():
+    global check_all_good
+    now=datetime.now()
+    if now.hour==0:
+        check_all_good=0
+    if check_all_good==0 and now.hour in [h for h in range(3,12)]:
+        check_all_good=updateTodayBothPlaces()
+    print check_all_good
+    return
