@@ -292,7 +292,7 @@ def updateTodayBothPlaces():
 # updatebothplaces runs between 3 am utc and 12 am utc
 # siris is on UTC, therefore the check variable needs to be reset at  00 pm machine time
 check_all_good=0
-
+logfile='logfile.txt'
 def job():
     global check_all_good
     now=datetime.now()
@@ -300,5 +300,7 @@ def job():
         check_all_good=0
     if check_all_good==0 and now.hour in [h for h in range(3,12)]:
         check_all_good=updateTodayBothPlaces()
-    print check_all_good
+    f=open(logfile,'a')
+    f.write(str(now)+','+str(check_all_good)+'\n')
+    f.close()
     return
