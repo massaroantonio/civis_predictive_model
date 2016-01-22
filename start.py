@@ -7,7 +7,8 @@ import numpy as np
 app = Flask(__name__)
 # from app import app
 
-root=os.getcwd()+'/'
+#root=os.getcwd()+'/'
+root='/home/ubuntu/civis_predictive_model/'
 # # one run per day at 3 am, hence the file starts from midnight of the same day
 run_hour='00'
 
@@ -19,7 +20,7 @@ currentDate = datetime.datetime.now()
 # currentDate=datetime.datetime(2015,12,11)
 
 
-roundedHour = '00' 
+roundedHour = '00'
 # # roundedHour = int(3*round(currentDate.hour/3))
 currentDate = currentDate.replace(minute=0, second=0, microsecond=0, hour=int(roundedHour))
 # added for debugging purpose, just to make sure the corresponding output file is there
@@ -30,7 +31,7 @@ currentDate = currentDate.replace(minute=0, second=0, microsecond=0, hour=int(ro
 
 # datesArray= []
 # for i in range(48):
-# 	datesArray.append({"date" : str(currentDate+datetime.timedelta(hours=3*i)), "tarif" : "high"})
+#       datesArray.append({"date" : str(currentDate+datetime.timedelta(hours=3*i)), "tarif" : "high"})
 
 # # datesArray =[]
 # datesArrayStoro=[]
@@ -39,13 +40,13 @@ currentDate = currentDate.replace(minute=0, second=0, microsecond=0, hour=int(ro
 # root=os.getcwd()+'/'
 # run_hour="00"
 # for place in places:
-# 	current_dir=str(currentDate.day)+'_'+str(currentDate.month)+'_'+str(currentDate.year)+'_'+run_hour+'_'+place
-# 	signal_file=root+'outputs/'+current_dir+'/signal_'+str(currentDate.day)+'_'+str(currentDate.month)+'_'+str(currentDate.year)+'_'+run_hour+'_'+place+'.txt'
-# 	# signal_file is effectively a csv file, so we can use csv.py functions
-# 	with open(signal_file) as csvfile:
-# 		fileReader = csv.reader(csvfile)
-# 			for row in fileReader:
-# 				datesArray.append({"date" : str(currentDate+datetime.timedelta(row[0])), "tarif" : row[1]})
+#       current_dir=str(currentDate.day)+'_'+str(currentDate.month)+'_'+str(currentDate.year)+'_'+run_hour+'_'+place
+#       signal_file=root+'outputs/'+current_dir+'/signal_'+str(currentDate.day)+'_'+str(currentDate.month)+'_'+str(currentDate.year)+'_'+run_hour+'_'+place+'.txt'
+#       # signal_file is effectively a csv file, so we can use csv.py functions
+#       with open(signal_file) as csvfile:
+#               fileReader = csv.reader(csvfile)
+#                       for row in fileReader:
+#                               datesArray.append({"date" : str(currentDate+datetime.timedelta(row[0])), "tarif" : row[1]})
 
 #note: the data relative to the current date must be already available for the function to give outputm otherwise it outputs a warning
 def get_nearest_value(place,givenDate):
@@ -53,7 +54,7 @@ def get_nearest_value(place,givenDate):
     m=givenDate.month
     d=givenDate.day
     h=givenDate.hour
-    mydir=str(d)+'_'+str(m)+'_'+str(y)+'_00_'+place    
+    mydir=str(d)+'_'+str(m)+'_'+str(y)+'_00_'+place
     myfile='signal_'+str(d)+'_'+str(m)+'_'+str(y)+'_00_'+place+'.txt'
     output_dir=root+'outputs/'
     assert mydir in os.listdir(output_dir) ,'the forecast for the current day and place has not been run yet'
@@ -75,7 +76,7 @@ def get_nearest_value_now(place):
 
 @app.route('/api/tou/storo/current', methods=['GET'])
 def get_current_storo():
-	return jsonify(tarif=get_nearest_value('Storo',currentDate))
+        return jsonify(tarif=get_nearest_value('Storo',currentDate))
 
 @app.route('/api/tou/sanlorenzo/current', methods=['GET'])
 def get_current_sanlorenzo():
@@ -83,38 +84,42 @@ def get_current_sanlorenzo():
 
 @app.route('/api/tou/storo', methods=['GET'])
 def get_storo():
-	place='Storo'
-	datesArrayStoro=[]
-	current_dir=str(currentDate.day)+'_'+str(currentDate.month)+'_'+str(currentDate.year)+'_'+run_hour+'_'+place
-	output_dir=root+'outputs/'
-	assert current_dir in os.listdir(output_dir) ,'the forecast for the current day and place has not been run yet'
-	signal_file=root+'outputs/'+current_dir+'/signal_'+str(currentDate.day)+'_'+str(currentDate.month)+'_'+str(currentDate.year)+'_'+run_hour+'_'+place+'.txt'
-	f = open(signal_file, 'r')
-	# try:
-	fileReader = csv.reader(f)
-	for row in fileReader:
-		datesArrayStoro.append({"date" : str(currentDate+datetime.timedelta(int(row[0]))), "tarif" : row[1]})
+        place='Storo'
+        datesArrayStoro=[]
+        current_dir=str(currentDate.day)+'_'+str(currentDate.month)+'_'+str(currentDate.year)+'_'+run_hour+'_'+place
+        output_dir=root+'outputs/'
+        assert current_dir in os.listdir(output_dir) ,'the forecast for the current day and place has not been run yet'
+        signal_file=root+'outputs/'+current_dir+'/signal_'+str(currentDate.day)+'_'+str(currentDate.month)+'_'+str(currentDate.year)+'_'+run_hour+'_'+place+'.txt'
+        f = open(signal_file, 'r')
+        # try:
+        fileReader = csv.reader(f)
+        for row in fileReader:
+                #edited by Antonio Massaro: timedelta(n) increases by n days, timedelta (0,m) increases by m seconds
+                #datesArrayStoro.append({"date" : str(currentDate+datetime.timedelta(int(row[0]))), "tarif" : row[1]})
+                datesArrayStoro.append({"date" : str(currentDate+datetime.timedelta(0,3600*int(row[0]))), "tarif" : row[1]})
     # finally:
-	f.close()
-	return jsonify({"data" : datesArrayStoro})
-
+        f.close()
+        return jsonify({"data" : datesArrayStoro})
+        
 @app.route('/api/tou/sanlorenzo', methods=['GET'])
 def get_sanlorenzo():
-	place='San_Lorenzo'
-	datesArraySanLorenzo=[]
-	current_dir=str(currentDate.day)+'_'+str(currentDate.month)+'_'+str(currentDate.year)+'_'+run_hour+'_'+place
-	output_dir=root+'outputs/'
-	assert current_dir in os.listdir(output_dir) ,'the forecast for the current day and place has not been run yet'
-	signal_file=root+'outputs/'+current_dir+'/signal_'+str(currentDate.day)+'_'+str(currentDate.month)+'_'+str(currentDate.year)+'_'+run_hour+'_'+place+'.txt'
-	# signal_file is effectively a csv file, so we can use csv.py functions
-	f = open(signal_file, 'r')
-	# try:
-	fileReader = csv.reader(f)
-	for row in fileReader:
-		datesArraySanLorenzo.append({"date" : str(currentDate+datetime.timedelta(int(row[0]))), "tarif" : row[1]})
+        place='San_Lorenzo'
+        datesArraySanLorenzo=[]
+        current_dir=str(currentDate.day)+'_'+str(currentDate.month)+'_'+str(currentDate.year)+'_'+run_hour+'_'+place
+        output_dir=root+'outputs/'
+        assert current_dir in os.listdir(output_dir) ,'the forecast for the current day and place has not been run yet'
+        signal_file=root+'outputs/'+current_dir+'/signal_'+str(currentDate.day)+'_'+str(currentDate.month)+'_'+str(currentDate.year)+'_'+run_hour+'_'+place+'.txt'
+        # signal_file is effectively a csv file, so we can use csv.py functions
+        f = open(signal_file, 'r')
+        # try:
+        fileReader = csv.reader(f)
+        for row in fileReader:
+                #edited by Antonio Massaro: timedelta(n) increases by n days, timedelta (0,m) increases by m seconds
+                #datesArrayStoro.append({"date" : str(currentDate+datetime.timedelta(int(row[0]))), "tarif" : row[1]})
+                datesArraySanLorenzo.append({"date" : str(currentDate+datetime.timedelta(0,3600*int(row[0]))), "tarif" : row[1]})
     # finally:
-	f.close()
-	return jsonify({"data" : datesArraySanLorenzo})
+        f.close()
+        return jsonify({"data" : datesArraySanLorenzo})
     # return jsonify({"data" : datesArray})
 
 if __name__ == '__main__':
